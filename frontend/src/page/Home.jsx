@@ -174,23 +174,29 @@ function Home() {
     <div>
       <Topbar onSearchNote={onSearchNote} />
       <div style={{ padding: "20px", position: "relative" }}>
-        {Array.isArray(allNotes) && allNotes.length > 0 ? (
-          allNotes.map((note) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={note._id}>
-              <Notecard
-                title={note.title}
-                content={note.content}
-                date={note.date} // Pass the date field here
-                onDelete={() => deleteNote(note._id)}
-                onEdit={() => handleEditOpen(note)}
-              />
+        <Grid container spacing={2}>
+          {" "}
+          {/* Parent Grid with spacing */}
+          {Array.isArray(allNotes) && allNotes.length > 0 ? (
+            allNotes.map((note) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={note._id}>
+                {" "}
+                {/* Child Grid for each note */}
+                <Notecard
+                  title={note.title}
+                  content={note.content}
+                  date={note.date} // Pass the date field here
+                  onDelete={() => deleteNote(note._id)}
+                  onEdit={() => handleEditOpen(note)}
+                />
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12}>
+              <EmptyCard />
             </Grid>
-          ))
-        ) : (
-          <Grid item xs={12}>
-            <EmptyCard />
-          </Grid>
-        )}
+          )}
+        </Grid>
 
         {/* Floating Action Button (FAB) for adding a note */}
         <Fab
@@ -269,7 +275,7 @@ function Home() {
               <CancelIcon />
             </IconButton>
           </DialogTitle>
-          <DialogContent sx={{overflow:'hidden'}}>
+          <DialogContent sx={{ overflow: "hidden" }}>
             <TextField
               autoFocus
               margin="dense"

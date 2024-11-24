@@ -4,11 +4,12 @@ import Signup from './Signup';
 import { useDispatch } from 'react-redux';
 import { validateEmail } from '../utills/helper';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { signInFailure, signInStart, signInSuccess, setCurrentUser } from '../redux/user/userSlice';
 import { toast } from 'react-toastify';
+import { GoogleLogin } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
-import {setCurrentUser} from '../redux/user/userSlice';
+
 function Login() {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
@@ -36,23 +37,47 @@ function Login() {
       dispatch(signInStart());
       const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email,
-        password
+        password,
       }, { withCredentials: true });
 
       if (response.data.success === false) {
         dispatch(signInFailure(response.data.message));
-        setError(response.data.message); // Set error message from API
+        setError(response.data.message);
       } else {
         dispatch(signInSuccess(response.data));
         toast.success(response.data.message || 'Login successful!');
-        console.log(response?.data?.user?.username)
         navigate('/home');
         dispatch(setCurrentUser(response?.data?.user?.username));
-        
       }
     } catch (error) {
       toast.error(error.message);
       setError(error.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      const { credential } = credentialResponse;
+      dispatch(signInStart());
+      const response = await axios.post(
+        'http://localhost:3000/api/auth/google',
+        { token: credential },
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        dispatch(signInSuccess(response.data));
+        toast.success('Google login successful!');
+        navigate('/home');
+        dispatch(setCurrentUser(response?.data?.user?.username));
+      } else {
+        setError(response.data.message || 'Google login failed');
+        dispatch(signInFailure(response.data.message));
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Google login failed');
+      toast.error(error.message);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -82,14 +107,20 @@ function Login() {
                 required
               />
             </div>
-            {/* Display Error Message */}
             {error && <div className="error-message">{error}</div>}
             <button type="submit" className="login-button">
               Login
             </button>
           </form>
-          <div className='forgot-password'>
-          <a href="#">Forgot Password?</a>
+          <div className="google-login">
+            <p>Or</p>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={() => setError('Google login failed')}
+            />
+          </div>
+          <div className="forgot-password">
+            <a href="#">Forgot Password?</a>
           </div>
           <div className="login-footer">
             <p>

@@ -6,14 +6,16 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from "react-redux"
 import { persistor, store } from "./redux/store.js"
 import { PersistGate } from "redux-persist/integration/react"
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <GoogleOAuthProvider clientId="153137155936-ad5tt92daavm89gs39ltsbmbbugnt4lk.apps.googleusercontent.com">
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <App />
     </PersistGate>
   </Provider>
+  </GoogleOAuthProvider>,
 );
 
 // If you want to start measuring performance in your app, pass a function
