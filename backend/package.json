@@ -9,7 +9,8 @@
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.2",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "twilio": "^5.3.6"
   },
   "name": "backend",
   "type": "module",

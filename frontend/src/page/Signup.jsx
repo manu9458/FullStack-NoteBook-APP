@@ -9,11 +9,12 @@ function Signup({ onSignupSuccess }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(''); // New state for phone number
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !phoneNumber) {
       toast.error('All fields are required');
       return;
     }
@@ -21,7 +22,7 @@ function Signup({ onSignupSuccess }) {
     try {
       const response = await axios.post(
         'http://localhost:3000/api/auth/signup',
-        { username, email, password },
+        { username, email, password, phoneNumber }, // Include phone number in the request
         { withCredentials: true }
       );
 
@@ -62,6 +63,14 @@ function Signup({ onSignupSuccess }) {
           className="login-input"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <input
+          type="tel"
+          placeholder="Phone Number"
+          className="login-input"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
           required
         />
         <button type="submit" className="login-button">
