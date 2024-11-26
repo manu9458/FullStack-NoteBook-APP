@@ -1,13 +1,6 @@
 import User from "../modals/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import twilio from "twilio";
-
-// Twilio Configuration
-const client = twilio("AC4259f5159d1d5e5c9c5d35154b3e54e9", "1ad0cf1f72ed314e485a447af700ff5b");
-
-// Temporary OTP store (use Redis or similar in production)
-const otpStore = {};
 
 // Signup Handler
 const signuphandler = async (req, res, next) => {
@@ -37,7 +30,7 @@ const signuphandler = async (req, res, next) => {
     }
 };
 
-// Signin Handler with 2FA OTP
+// Signin Handler without OTP
 const signinhandler = async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -54,49 +47,7 @@ const signinhandler = async (req, res, next) => {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        // Check if the user has a phone number
-        if (!user.phoneNumber) {
-            return res.status(400).json({ message: "No phone number associated with this account." });
-        }
-
-        // Generate a 6-digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // Valid for 5 minutes
-
-        // Send OTP via Twilio
-        await client.messages.create({
-            body: `Your login OTP is: ${otp}`,
-            from: '+1 681 230 5943',
-            to: user.phoneNumber,
-        });
-
-        res.status(200).json({ message: "OTP sent successfully!" });
-    } catch (error) {
-        next(error); // Pass errors to the error-handling middleware
-    }
-};
-
-// OTP Verification Handler
-const verifyOtp = async (req, res, next) => {
-    const { email, otp } = req.body;
-
-    try {
-        const otpData = otpStore[email];
-
-        // Check if OTP exists and is valid
-        if (!otpData || otpData.expiresAt < Date.now()) {
-            return res.status(400).json({ message: "OTP is invalid or expired." });
-        }
-
-        if (otpData.otp !== parseInt(otp)) {
-            return res.status(400).json({ message: "Invalid OTP." });
-        }
-
-        // OTP is valid; clear it from the store
-        delete otpStore[email];
-
         // Generate JWT token
-        const user = await User.findOne({ email: email });
         const token = jwt.sign(
             { id: user._id, email: user.email, username: user.username },
             process.env.JWT_SECRET, // Use your secret key
@@ -111,7 +62,7 @@ const verifyOtp = async (req, res, next) => {
             sameSite: "strict",
         });
 
-        res.status(200).json({ message: "Login successful with OTP verification", user: { email: user.email, username: user.username } });
+        res.status(200).json({ message: "Login successful", user: { email: user.email, username: user.username } });
     } catch (error) {
         next(error); // Pass errors to the error-handling middleware
     }
@@ -154,4 +105,4 @@ const signouthandler = async (req, res, next) => {
 };
 
 // Export named functions
-export { signuphandler, signinhandler, verifyOtp, signouthandler, updatePhoneNumber };
+export { signuphandler, signinhandler, signouthandler, updatePhoneNumber };
