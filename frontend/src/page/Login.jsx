@@ -20,40 +20,42 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     if (!validateEmail(email)) {
       setError("Please enter a valid email address");
       return;
     }
-
+  
     if (!password) {
       setError("Please enter the password");
       return;
     }
-
+  
     setError("");
-
+  
     try {
       dispatch(signInStart());
       const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email,
         password,
       }, { withCredentials: true });
-
+  
       if (response.data.success === false) {
         dispatch(signInFailure(response.data.message));
         setError(response.data.message);
       } else {
         dispatch(signInSuccess(response.data));
         toast.success(response.data.message || 'Login successful!');
-        navigate('/home');
-        dispatch(setCurrentUser(response?.data?.user?.username));
+        // Redirect to OTP verification page with email as a parameter
+        console.log("Response from send OTP:", response.data); // Debug log
+        navigate('/otp-verification', { state: { email } });
       }
     } catch (error) {
       toast.error(error.message);
       setError(error.response?.data?.message || 'Login failed');
     }
   };
+  
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
