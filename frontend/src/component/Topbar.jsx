@@ -70,8 +70,8 @@ function Topbar({ onSearchNote }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const user_ = useSelector((state) => state.user.currentUser);
-  const username = user_ ? user_?.split(' ')[0] : '';
-  const firstLetter = username ? username?.charAt(0)?.toUpperCase() : ''; // Get the first letter and capitalize it
+  const username = user_ ? user_.split(' ')[0] : '';
+  const firstLetter = username ? username.charAt(0).toUpperCase() : ''; // Get the first letter and capitalize it
 
   const handleLogout = async () => {
     try {

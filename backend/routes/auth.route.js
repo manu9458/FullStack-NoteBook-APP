@@ -3,8 +3,7 @@ import {
     signuphandler, 
     signinhandler, 
     signouthandler, 
-    updatePhoneNumber,
-    verifyOtp
+    updatePhoneNumber
 } from '../controller/auth.controller.js';
 import { OAuth2Client } from 'google-auth-library';
 import User from '../modals/user.model.js';
@@ -45,8 +44,8 @@ router.post('/google', async (req, res) => {
 });
 
 // // 2FA OTP Routes
-router.post('/send-otp', signinhandler); // Send OTP after login with email and password
-router.post('/verify-otp', verifyOtp); // Verify OTP for login
+// router.post('/send-otp', signinhandler); // Send OTP after login with email and password
+// router.post('/verify-otp', verifyOtp); // Verify OTP for login
 
 // Update Phone Number Route
 router.post('/update-phone', updatePhoneNumber); // Allow users to update/add phone numbers
