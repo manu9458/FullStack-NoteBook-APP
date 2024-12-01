@@ -11,7 +11,7 @@ const app = express();
 // //to make input as json
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:[process.env.CLIENT_URL], credentials:true}))
+app.use(cors({origin:["https://fullstack-app-y3zb.onrender.com"], credentials:true}))
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB');
