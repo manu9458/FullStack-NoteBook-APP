@@ -11,7 +11,7 @@ const app = express();
 // //to make input as json
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:["http://localhost:3001"], credentials:true}))
+app.use(cors({origin:[process.env.CLIENT_URL], credentials:true}))
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB');
@@ -19,8 +19,9 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log(error);
 });
 
-app.listen(3000,() => {
-    console.log(`Server is running on port 3000`);
+const PORT_NUMBER = process.env.PORT || 8080
+app.listen(PORT_NUMBER,() => {
+    console.log(`Server is running on port ${PORT_NUMBER}`);
 });
 
 import authRouter from './routes/auth.route.js';
