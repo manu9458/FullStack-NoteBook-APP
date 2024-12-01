@@ -11,12 +11,7 @@ const app = express();
 // //to make input as json              
 app.use(express.json());
 app.use(cookieParser());
-<<<<<<< HEAD
 app.use(cors({origin:["http://localhost:3001"], credentials:true}))
-=======
-app.use(cors({origin:[process.env.CLIENT_URL], credentials:true}))
->>>>>>> parent of 8290aba (Add microservices link in froent end)
-
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB');
 }).catch((error) => {
