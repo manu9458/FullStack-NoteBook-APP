@@ -35,7 +35,8 @@ function Login() {
   
     try {
       dispatch(signInStart());
-      const response = await axios.post('https://fullstack-app-y3zb.onrender.com/api/auth/signin', {
+      console.log("Attempting to login with:", { email, password });
+      const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email,
         password,
       }, { withCredentials: true });
@@ -56,33 +57,6 @@ function Login() {
     }
   };
   
-
-  const handleGoogleLoginSuccess = async (credentialResponse) => {
-    try {
-      const { credential } = credentialResponse;
-      dispatch(signInStart());
-      const response = await axios.post(
-        'https://fullstack-app-y3zb.onrender.com/api/auth/google',
-        { token: credential },
-        { withCredentials: true }
-      );
-
-      if (response.data.success) {
-        dispatch(signInSuccess(response.data));
-        toast.success('Google login successful!');
-        navigate('/home');
-        dispatch(setCurrentUser(response?.data?.user?.username));
-      } else {
-        setError(response.data.message || 'Google login failed');
-        dispatch(signInFailure(response.data.message));
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || 'Google login failed');
-      toast.error(error.message);
-      dispatch(signInFailure(error.message));
-    }
-  };
-
   return (
     <div className="login-overlay">
       {isSignup ? (
@@ -114,13 +88,6 @@ function Login() {
               Login
             </button>
           </form>
-          <div className="google-login">
-            <p>Or</p>
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={() => setError('Google login failed')}
-            />
-          </div>
           <div className="forgot-password">
             <a href="#">Forgot Password?</a>
           </div>

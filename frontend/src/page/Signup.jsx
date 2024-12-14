@@ -21,7 +21,7 @@ function Signup({ onSignupSuccess }) {
 
     try {
       const response = await axios.post(
-        'https://fullstack-app-y3zb.onrender.com/api/auth/signup',
+        'http://localhost:3000/api/auth/signup',
         { username, email, password, phoneNumber }, // Include phone number in the request
         { withCredentials: true }
       );

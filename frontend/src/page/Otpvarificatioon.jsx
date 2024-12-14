@@ -26,7 +26,7 @@ const Otpverification = () => {
     try {
        
         const response = await axios.post(
-            "https://fullstack-app-y3zb.onrender.com/api/auth/verify-otp",
+            "http://localhost:3000/api/auth/verify-otp",
             { email, otp },
             { withCredentials: true } // This allows cookies to be set
         );
