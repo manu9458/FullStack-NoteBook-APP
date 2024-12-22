@@ -2,9 +2,52 @@ import User from "../modals/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
 
-// Twilio Configuration
-const client = twilio("AC4259f5159d1d5e5c9c5d35154b3e54e9", "1ad0cf1f72ed314e485a447af700ff5b");
+// Debug: Print current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+console.log('Current directory:', __dirname);
+
+// Try multiple possible paths
+const envPaths = [
+    path.resolve(__dirname, '../../.env'),
+    path.resolve(__dirname, '../.env'),
+    path.resolve(__dirname, '.env')
+];
+
+// Load environment variables
+let loaded = false;
+for (const envPath of envPaths) {
+    console.log('Trying path:', envPath);
+    const result = dotenv.config({ path: envPath });
+    if (!result.error) {
+        console.log('Loaded env from:', envPath);
+        loaded = true;
+        break;
+    }
+}
+
+if (!loaded) {
+    throw new Error('Could not load .env file');
+}
+
+// Verify environment variables
+console.log('Environment variables loaded:', {
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not set',
+    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not set'
+});
+
+console.log('Environment variables:', {
+  sid: process.env.TWILIO_ACCOUNT_SID,
+  token: process.env.TWILIO_AUTH_TOKEN
+});
+
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Temporary OTP store (use Redis or similar in production)
 const otpStore = {};
@@ -173,6 +216,56 @@ const signouthandler = async (req, res, next) => {
         next(error); // Pass errors to the error-handling middleware
     }
 };
+const forgotPasswordRequest = async (req, res) => {
+  const { email } = req.body;
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.phoneNumber) {
+          return res.status(400).json({ message: "No phone number associated with account" });
+      }
+
+      // Validate phone number format
+      const formattedPhone = user.phoneNumber.startsWith('+') 
+          ? user.phoneNumber 
+          : `+${user.phoneNumber}`;
+
+      // Generate OTP
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      
+      // Store OTP
+      user.resetPasswordOtp = otp;
+      user.resetPasswordExpires = Date.now() + 600000;
+      await user.save();
+
+      // Send OTP via Twilio with error handling
+      try {
+          const message = await client.messages.create({
+              body: `Your password reset OTP is: ${otp}`,
+              to: user.phoneNumber,
+              from: '+1 681 230 5943',
+          });
+          console.log('Twilio message sent:', message.sid);
+          
+          res.status(200).json({ 
+              message: "OTP sent successfully",
+              messageId: message.sid
+          });
+      } catch (twilioError) {
+          console.error('Twilio error:', twilioError);
+          return res.status(500).json({ 
+              message: "Failed to send OTP",
+              error: twilioError.message 
+          });
+      }
+  } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Server error" });
+  }
+};
 
 // Export named functions
-export { signuphandler, signinhandler, verifyOtp, signouthandler, updatePhoneNumber };  
+export { signuphandler, signinhandler, verifyOtp, signouthandler, updatePhoneNumber, forgotPasswordRequest };  

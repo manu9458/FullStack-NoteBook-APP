@@ -48,8 +48,9 @@ function Login() {
         dispatch(signInSuccess(response.data));
         toast.success(response.data.message || 'Login successful!');
         // Redirect to OTP verification page with email as a parameter
+        
         console.log("Response from send OTP:", response.data); // Debug log
-        navigate('/otp-verification', { state: { email } });
+        navigate('/otp-verification', { state: { email,  phoneNumber } });
       }
     } catch (error) {
       toast.error(error.message);

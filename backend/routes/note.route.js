@@ -19,4 +19,5 @@ router.get("/search", verifyToken, searchNotesByTitle);
 // //delete notes
 router.delete("/delete/:noteId", verifyToken, deleteNote)
 
+
 export default router;

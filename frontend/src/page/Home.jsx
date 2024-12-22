@@ -10,6 +10,8 @@ import {
   TextField,
   Button,
   IconButton,
+  Box,
+  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -17,6 +19,7 @@ import Topbar from "../component/Topbar";
 import { toast } from "react-toastify";
 import axios from "axios";
 import EmptyCard from "../component/Emptycard/Emptycard";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 function Home() {
   const [open, setOpen] = useState(false); // Modal for adding a new note
@@ -24,19 +27,12 @@ function Home() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedNote, setSelectedNote] = useState(null); // Currently selected note for editing
-  const [allNotes, setAllNotes] = useState([]);
+  const [allNotes, setAllNotes] = useState([]); // All notes (both pinned and unpinned)
   const [isSearch, setIsSearch] = useState(false);
-  // Open the add note modal
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
-  // Close the add note modal
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleClickOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-  // Open the edit modal
   const handleEditOpen = (note) => {
     setSelectedNote(note);
     setTitle(note.title);
@@ -44,7 +40,6 @@ function Home() {
     setEditOpen(true);
   };
 
-  // Close the edit modal
   const handleEditClose = () => {
     setEditOpen(false);
     setSelectedNote(null);
@@ -52,7 +47,6 @@ function Home() {
     setContent("");
   };
 
-  // Add a new note
   const addNewNote = async () => {
     try {
       const res = await axios.post(
@@ -60,44 +54,36 @@ function Home() {
         { title, content },
         { withCredentials: true }
       );
-
       if (!res.data.success) {
         toast.error(res.data.message);
         return;
       }
-
       toast.success(res.data.message);
       setTitle("");
       setContent("");
       handleClose();
-      getAllNotes(); // Refresh notes after adding
+      getAllNotes();
     } catch (error) {
       toast.error(error.message);
       console.log(error.message);
     }
   };
 
-  // Fetch all notes
   const getAllNotes = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/note/all", {
         withCredentials: true,
       });
-
       if (!res.data.success) {
         console.log(res.data.message);
         return;
       }
-
-      setAllNotes(res.data.notes); // Assuming the API response contains `notes`
+      setAllNotes(res.data.notes);
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log("allNotes", allNotes);
-
-  // Delete a note by ID
   const deleteNote = async (noteId) => {
     try {
       const res = await axios.delete(
@@ -106,21 +92,18 @@ function Home() {
           withCredentials: true,
         }
       );
-
       if (!res.data.success) {
         toast.error(res.data.message);
         return;
       }
-
       toast.success(res.data.message);
-      setAllNotes(allNotes.filter((note) => note._id !== noteId)); // Remove the deleted note from the list
+      setAllNotes(allNotes.filter((note) => note._id !== noteId));
     } catch (error) {
       console.log(error);
       toast.error("Failed to delete the note");
     }
   };
 
-  // Edit a note
   const editNote = async () => {
     if (!selectedNote) return;
 
@@ -130,15 +113,13 @@ function Home() {
         { title, content },
         { withCredentials: true }
       );
-
       if (!res.data.success) {
         toast.error(res.data.message);
         return;
       }
-
       toast.success(res.data.message);
       handleEditClose();
-      getAllNotes(); // Refresh notes after editing
+      getAllNotes();
     } catch (error) {
       console.log(error);
       toast.error("Failed to edit the note");
@@ -148,72 +129,160 @@ function Home() {
   const onSearchNote = async (query) => {
     try {
       const res = await axios.get("http://localhost:3000/api/note/search", {
-        params: { title: query }, // Use title as the query parameter key
+        params: { title: query },
         withCredentials: true,
       });
-
       if (res.data.success === false) {
         console.log(res.data.message);
         toast.error(res.data.message);
         return;
       }
-
       setIsSearch(true);
-      setAllNotes(res.data.notes); // Assuming API returns a list of notes
+      setAllNotes(res.data.notes);
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  // Load notes when the component mounts
+  const togglePin = async (noteId, isPinned) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/note/pin/${noteId}`,
+        { isPinned: !isPinned }, // Toggle the pin state
+        { withCredentials: true }
+      );
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      toast.success(res.data.message);
+
+      // Update the note's pin status in the state
+      setAllNotes(
+        allNotes.map((note) =>
+          note._id === noteId ? { ...note, isPinned: !isPinned } : note
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to update pin status");
+    }
+  };
+
+  const handleDragEnd = (result) => {
+    const { destination, source } = result;
+
+    if (!destination) return;
+
+    if (destination.index === source.index) return;
+
+    const reorderedNotes = Array.from(allNotes);
+    const [removed] = reorderedNotes.splice(source.index, 1);
+    reorderedNotes.splice(destination.index, 0, removed);
+    setAllNotes(reorderedNotes);
+  };
+
   useEffect(() => {
     getAllNotes();
   }, []);
+
+  const pinnedNotes = allNotes.filter((note) => note.isPinned);
+  const unpinnedNotes = allNotes.filter((note) => !note.isPinned);
 
   return (
     <div>
       <Topbar onSearchNote={onSearchNote} />
       <div style={{ padding: "20px", position: "relative" }}>
-        <Grid container spacing={2}>
-          {" "}
-          {/* Parent Grid with spacing */}
-          {Array.isArray(allNotes) && allNotes.length > 0 ? (
-            allNotes.map((note) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={note._id}>
-                {" "}
-                {/* Child Grid for each note */}
-                <Notecard
-                  title={note.title}
-                  content={note.content}
-                  date={note.date} // Pass the date field here
-                  onDelete={() => deleteNote(note._id)}
-                  onEdit={() => handleEditOpen(note)}
-                />
-              </Grid>
-            ))
-          ) : (
-            <Grid item xs={12}>
-              <EmptyCard />
-            </Grid>
-          )}
-        </Grid>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Grid container spacing={2}>
+            <Droppable droppableId="pinnedNotes">
+              {(provided) => (
+                <Grid
+                  container
+                  spacing={2}
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {pinnedNotes.map((note, index) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={note._id}>
+                      <Draggable draggableId={note._id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <Notecard
+                              title={note.title}
+                              content={note.content}
+                              date={note.date}
+                              onDelete={() => deleteNote(note._id)}
+                              onEdit={() => handleEditOpen(note)}
+                              onPin={() => togglePin(note._id, note.isPinned)} // Use togglePin here
+                              isPinned={note.isPinned}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    </Grid>
+                  ))}
+                  {provided.placeholder}
+                </Grid>
+              )}
+            </Droppable>
 
-        {/* Floating Action Button (FAB) for adding a note */}
+            <Droppable droppableId="unpinnedNotes">
+              {(provided) => (
+                <Grid
+                  container
+                  spacing={2}
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {unpinnedNotes.map((note, index) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={note._id}>
+                      <Draggable draggableId={note._id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <Notecard
+                              title={note.title}
+                              content={note.content}
+                              date={note.date}
+                              onDelete={() => deleteNote(note._id)}
+                              onEdit={() => handleEditOpen(note)}
+                              onPin={() => {}}
+                              isPinned={false}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    </Grid>
+                  ))}
+                  {provided.placeholder}
+                </Grid>
+              )}
+            </Droppable>
+          </Grid>
+        </DragDropContext>
+
         <Fab
           color="primary"
           aria-label="add"
           sx={{
-            position: "fixed", // Fix position to the bottom right
-            bottom: "20px", // Adjust the distance from the bottom
-            right: "20px", // Adjust the distance from the right
-            zIndex: 1000, // Ensure it's above other content
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            zIndex: 1000,
           }}
           onClick={handleClickOpen}
         >
           <AddIcon />
         </Fab>
 
-        {/* Add Note Modal */}
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>
             Add Note

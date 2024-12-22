@@ -10,12 +10,26 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { red, grey } from "@mui/material/colors";
 import { Box } from "@mui/material";
-
-export default function Notecard({ title, content, date, onEdit, onDelete }) {
-  const [isPinned, setIsPinned] = React.useState(false);
-
-  const handlePinClick = () => {
-    setIsPinned((prev) => !prev);
+import ShareIcon from '@mui/icons-material/Share';
+import WallpaperIcon from '@mui/icons-material/Wallpaper';
+export default function Notecard({ title, content, date, onEdit, onDelete, onPin, isPinned }) {
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: title,
+          text: content,
+          url: window.location.href,
+        })
+        .then(() => {
+          console.log("Shared successfully");
+        })
+        .catch((error) => {
+          console.log("Error sharing: ", error);
+        });
+    } else {
+      console.log("Web Share API not supported in this browser.");
+    }
   };
 
   return (
@@ -25,31 +39,20 @@ export default function Notecard({ title, content, date, onEdit, onDelete }) {
           <Typography gutterBottom variant="h5" component="div">
             {title || "Untitled Note"}
           </Typography>
-          <IconButton
-            size="small"
-            onClick={handlePinClick}
-            sx={{ color: isPinned ? red[500] : grey[500] }}
-          >
-            <PinIcon />
-          </IconButton>
         </div>
-          {/* Date Section */}
-         <Box sx={{ display: "flex", justifyContent: "flex-start",marginTop:'-10px' }}>
-         {date && (
-          <Typography variant="caption" color="text.secondary" sx={{color:'red'}}>
-            {new Date(date).toLocaleDateString()}{" "}
-            {new Date(date).toLocaleTimeString()}
+        {/* Date Section */}
+        <Box sx={{ display: "flex", justifyContent: "flex-start", marginTop: '-10px' }}>
+          {date && (
+            <Typography variant="caption" color="text.secondary" sx={{ color: 'red' }}>
+              {new Date(date).toLocaleDateString()}{" "}
+              {new Date(date).toLocaleTimeString()}
+            </Typography>
+          )}
+        </Box>
+        <Box sx={{ marginTop: "10px", display: 'flex', justifyContent: 'flex-start' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 1 }}>
+            {content || "No content available"}
           </Typography>
-        )}
-         </Box>
-        <Box sx={{marginTop:"10px", display:'flex', justifyContent:'flex-start'}}>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ marginBottom: 1 }}
-        >
-          {content || "No content available"}
-        </Typography>
         </Box>
       </CardContent>
       <CardActions
@@ -59,7 +62,10 @@ export default function Notecard({ title, content, date, onEdit, onDelete }) {
           alignItems: "center",
         }}
       >
-        <Button size="small">Share</Button>
+        <div style={{display:'flex', gap:'7px'}}>
+        <ShareIcon sx={{cursor:'pointer'}} onClick={handleShare}></ShareIcon>
+        <WallpaperIcon sx={{cursor:'pointer'}}></WallpaperIcon>
+        </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <IconButton size="small" onClick={onEdit}>
             <EditIcon />
