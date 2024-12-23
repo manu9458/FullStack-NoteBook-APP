@@ -95,7 +95,7 @@ const Topbar = ({ onSearchNote }) => {
     <div className="topbar">
       {/* Left Section */}
       <div className="topbar-left">
-        <MenuIcon className="icon" />
+        {/* <MenuIcon className="icon" /> */}
         <img src={logo} alt="logo"></img>
         <span className="title">Keep</span>
       </div>
@@ -142,8 +142,8 @@ const Topbar = ({ onSearchNote }) => {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={handleClose}>{username}</MenuItem>
+        {/* <MenuItem onClick={handleClose}>My account</MenuItem> */}
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
         {/* <Typography variant="body1" noWrap sx={{ ml: 1 }}>

@@ -1,5 +1,5 @@
 import express from "express";
-import { addnotes, editnotes, getAllNotes, searchNotesByTitle, deleteNote } from "../controller/note.controller.js";
+import { addnotes, editnotes, getAllNotes, searchNotesByTitle, deleteNote, pinnedNote } from "../controller/note.controller.js";
 import { verifyToken } from "../utills/varifyUser.js";
 
 const router = express.Router();
@@ -18,6 +18,6 @@ router.get("/search", verifyToken, searchNotesByTitle);
 
 // //delete notes
 router.delete("/delete/:noteId", verifyToken, deleteNote)
-
+router.put("/pin/:noteId", verifyToken, pinnedNote);
 
 export default router;

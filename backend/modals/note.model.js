@@ -18,6 +18,10 @@ const NoteSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  background: {
+    type: Object,
+    default: { type: "color", value: "#ffffff" }, // Default to white background
+  },
   date: {
     type: Date,
     default: Date.now,

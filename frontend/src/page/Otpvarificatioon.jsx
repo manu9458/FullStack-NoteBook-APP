@@ -49,7 +49,7 @@ const Otpverification = () => {
     <div className="overlay">
     <div className="otp-container">
       <h2>OTP Verification</h2>
-      <p>A verification code has been sent to your email: {email}</p>
+      <p>A verification code has been sent to your registered mobile number:</p>
       <input
         type="text"
         placeholder="Enter OTP"
@@ -58,9 +58,9 @@ const Otpverification = () => {
         className="otp-input"
       />
       <div className="button-link">
-      <div style={{display:'flex', justifyContent:'flex-start'}}>
+      {/* <div style={{display:'flex', justifyContent:'flex-start'}}>
       <a href="#" alt="number" onClick={updatenumber}>Update Number</a>
-      </div>
+      </div> */}
     <div style={{marginTop:'21px'}}>
     <button onClick={handleOtpSubmit} className="otp-button">
         Verify OTP

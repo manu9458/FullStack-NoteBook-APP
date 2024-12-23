@@ -21,7 +21,7 @@ import axios from "axios";
 import EmptyCard from "../component/Emptycard/Emptycard";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-function Home() {
+function Home({ isGridView }) {
   const [open, setOpen] = useState(false); // Modal for adding a new note
   const [editOpen, setEditOpen] = useState(false); // Modal for editing a note
   const [title, setTitle] = useState("");
@@ -194,7 +194,13 @@ function Home() {
       <Topbar onSearchNote={onSearchNote} />
       <div style={{ padding: "20px", position: "relative" }}>
         <DragDropContext onDragEnd={handleDragEnd}>
-          <Grid container spacing={2}>
+          <Grid
+            container
+            spacing={2}
+            direction={isGridView ? "column" : "row"} // Adjust the direction based on isGridView
+            alignItems={isGridView ? "center" : "flex-start"} // Center the items in column view
+            justifyContent={isGridView ? "center" : "flex-start"} // Center the items in column view
+          >
             <Droppable droppableId="pinnedNotes">
               {(provided) => (
                 <Grid

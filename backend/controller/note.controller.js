@@ -2,8 +2,8 @@ import Note from "../modals/note.model.js";
 
 // Add Note
 export const addnotes = async (req, res, next) => {
-  const { title, content, isPined } = req.body;
-  const { id } = req.user; // Ensure `req.user` is set by middleware
+  const { title, content, isPined, background } = req.body;
+  const { id } = req.user;
 
   if (!title || !content) {
     return res.status(400).json({
@@ -17,6 +17,7 @@ export const addnotes = async (req, res, next) => {
       title,
       content,
       isPined: isPined || false,
+      background: background || { type: "color", value: "#ffffff" }, // Default background
       user: id,
     });
 
@@ -34,12 +35,11 @@ export const addnotes = async (req, res, next) => {
 
 // Edit Note
 export const editnotes = async (req, res, next) => {
-  const { noteid } = req.params; // Get `noteid` from route parameter
-  const { title, content, isPined } = req.body; // Get fields to be updated from request body
-  const { id: userId } = req.user; // Get user ID from middleware
+  const { noteid } = req.params;
+  const { title, content, isPined, background } = req.body;
+  const { id: userId } = req.user;
 
-  // Ensure at least one field is provided for updating
-  if (!title && !content && isPined === undefined) {
+  if (!title && !content && isPined === undefined && !background) {
     return res.status(400).json({
       success: false,
       message: "Please provide at least one field to update",
@@ -47,7 +47,6 @@ export const editnotes = async (req, res, next) => {
   }
 
   try {
-    // Find the note by `noteid` and ensure it belongs to the current user
     const note = await Note.findOne({ _id: noteid, user: userId });
 
     if (!note) {
@@ -57,24 +56,23 @@ export const editnotes = async (req, res, next) => {
       });
     }
 
-    // Update fields if provided in the request body
     if (title) note.title = title;
     if (content) note.content = content;
     if (isPined !== undefined) note.isPined = isPined;
+    if (background) note.background = background;
 
-    // Save the updated note to the database
     const updatedNote = await note.save();
 
-    // Respond with the updated note
     res.status(200).json({
       success: true,
       message: "Note updated successfully",
       note: updatedNote,
     });
   } catch (error) {
-    next(error); // Pass any error to the error handler
+    next(error);
   }
 };
+
 
 export const getAllNotes = async (req, res, next) => {
   console.log("Authenticated User:", req.user); // Log the authenticated user
@@ -153,4 +151,26 @@ export const deleteNote = async (req, res, next) => {
     });
   }
 };
+
+// Example route for pinning/unpinning a note
+ export const pinnedNote =async (req, res) => {
+  const { id } = req.params;
+  const { isPinned } = req.body;
+
+  try {
+    const updatedNote = await Note.findByIdAndUpdate(
+      id,
+      { isPinned },
+      { new: true } // Return the updated document
+    );
+    if (!updatedNote) {
+      return res.status(404).json({ success: false, message: "Note not found" });
+    }
+    res.json({ success: true, message: "Pin status updated", note: updatedNote });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to update pin status" });
+  }
+};
+
 

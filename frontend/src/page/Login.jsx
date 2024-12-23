@@ -50,7 +50,7 @@ function Login() {
         // Redirect to OTP verification page with email as a parameter
         
         console.log("Response from send OTP:", response.data); // Debug log
-        navigate('/otp-verification', { state: { email,  phoneNumber } });
+        navigate('/otp-verification', { state: { email: email } });
       }
     } catch (error) {
       toast.error(error.message);
@@ -89,9 +89,9 @@ function Login() {
               Login
             </button>
           </form>
-          <div className="forgot-password">
+          {/* <div className="forgot-password">
             <a href="#">Forgot Password?</a>
-          </div>
+          </div> */}
           <div className="login-footer">
             <p>
               Not yet registered?{' '}

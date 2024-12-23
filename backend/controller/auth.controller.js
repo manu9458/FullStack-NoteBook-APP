@@ -35,18 +35,6 @@ if (!loaded) {
     throw new Error('Could not load .env file');
 }
 
-// Verify environment variables
-console.log('Environment variables loaded:', {
-    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not set',
-    TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not set'
-});
-
-console.log('Environment variables:', {
-  sid: process.env.TWILIO_ACCOUNT_SID,
-  token: process.env.TWILIO_AUTH_TOKEN
-});
-
-
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Temporary OTP store (use Redis or similar in production)
