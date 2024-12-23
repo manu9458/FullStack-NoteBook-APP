@@ -41,7 +41,7 @@ const Topbar = ({ onSearchNote }) => {
   };
   const handleLogout = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/signout");
+      const response = await axios.post("https://notebookapp34.onrender.com/api/auth/signout");
 
       if (response.status === 200) {
         // Successfully logged out

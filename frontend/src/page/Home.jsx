@@ -50,7 +50,7 @@ function Home({ isGridView }) {
   const addNewNote = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/note/add",
+        "https://notebookapp34.onrender.com/api/note/add",
         { title, content },
         { withCredentials: true }
       );
@@ -71,7 +71,7 @@ function Home({ isGridView }) {
 
   const getAllNotes = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/note/all", {
+      const res = await axios.get("https://notebookapp34.onrender.com/api/note/all", {
         withCredentials: true,
       });
       if (!res.data.success) {
@@ -87,7 +87,7 @@ function Home({ isGridView }) {
   const deleteNote = async (noteId) => {
     try {
       const res = await axios.delete(
-        `http://localhost:3000/api/note/delete/${noteId}`,
+        `https://notebookapp34.onrender.com/api/note/delete/${noteId}`,
         {
           withCredentials: true,
         }
@@ -109,7 +109,7 @@ function Home({ isGridView }) {
 
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/note/edit/${selectedNote._id}`,
+        `https://notebookapp34.onrender.com/api/note/edit/${selectedNote._id}`,
         { title, content },
         { withCredentials: true }
       );
@@ -128,7 +128,7 @@ function Home({ isGridView }) {
 
   const onSearchNote = async (query) => {
     try {
-      const res = await axios.get("http://localhost:3000/api/note/search", {
+      const res = await axios.get("https://notebookapp34.onrender.com/api/note/search", {
         params: { title: query },
         withCredentials: true,
       });
@@ -147,7 +147,7 @@ function Home({ isGridView }) {
   const togglePin = async (noteId, isPinned) => {
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/note/pin/${noteId}`,
+        `https://notebookapp34.onrender.com/api/note/pin/${noteId}`,
         { isPinned: !isPinned }, // Toggle the pin state
         { withCredentials: true }
       );

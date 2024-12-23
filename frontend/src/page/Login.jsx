@@ -36,7 +36,7 @@ function Login() {
     try {
       dispatch(signInStart());
       console.log("Attempting to login with:", { email, password });
-      const response = await axios.post('http://localhost:3000/api/auth/signin', {
+      const response = await axios.post('https://notebookapp34.onrender.com/api/auth/signin', {
         email,
         password,
       }, { withCredentials: true });

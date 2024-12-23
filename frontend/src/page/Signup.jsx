@@ -21,7 +21,7 @@ function Signup({ onSignupSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/auth/signup',
+        'https://notebookapp34.onrender.com/api/auth/signup',
         { username, email, password, phoneNumber }, // Include phone number in the request
         { withCredentials: true }
       );
