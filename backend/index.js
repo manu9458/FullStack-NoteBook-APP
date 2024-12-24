@@ -41,7 +41,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://aesthetic-marigold-b153a6.netlify.app'], // Allow your frontend origin
+    origin: ['https://deluxe-mooncake-8c7269.netlify.app'], // Allow your frontend origin
     credentials: true,                // Allow cookies to be sent
 }));
 
