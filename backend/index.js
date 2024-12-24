@@ -41,7 +41,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:3001"], // Allow your frontend origin
+    origin: ["https://notebookapp34.onrender.com"], // Allow your frontend origin
     credentials: true,                // Allow cookies to be sent
 }));
 
