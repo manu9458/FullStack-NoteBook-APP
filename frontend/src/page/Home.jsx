@@ -56,7 +56,7 @@ function Home() {
   const addNewNote = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/note/add",
+        "https://keep-t7qy.onrender.com/api/note/add",
         { title, content },
         { withCredentials: true }
       );
@@ -80,7 +80,7 @@ function Home() {
   // Fetch all notes
   const getAllNotes = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/note/all", {
+      const res = await axios.get("https://keep-t7qy.onrender.com/api/note/all", {
         withCredentials: true,
       });
 
@@ -101,7 +101,7 @@ function Home() {
   const deleteNote = async (noteId) => {
     try {
       const res = await axios.delete(
-        `http://localhost:3000/api/note/delete/${noteId}`,
+        `https://keep-t7qy.onrender.com/api/note/delete/${noteId}`,
         {
           withCredentials: true,
         }
@@ -126,7 +126,7 @@ function Home() {
 
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/note/edit/${selectedNote._id}`,
+        `https://keep-t7qy.onrender.com/api/note/edit/${selectedNote._id}`,
         { title, content },
         { withCredentials: true }
       );
@@ -147,7 +147,7 @@ function Home() {
 
   const onSearchNote = async (query) => {
     try {
-      const res = await axios.get("http://localhost:3000/api/note/search", {
+      const res = await axios.get("https://keep-t7qy.onrender.com/api/note/search", {
         params: { title: query }, // Use title as the query parameter key
         withCredentials: true,
       });
