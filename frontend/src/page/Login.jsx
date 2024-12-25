@@ -35,7 +35,7 @@ function Login() {
   
     try {
       dispatch(signInStart());
-      const response = await axios.post('https://keep-t7qy.onrender.com/api/auth/signin', {
+      const response = await axios.post('http://localhost:3000/api/auth/signin', {
         email,
         password,
       }, { withCredentials: true });
@@ -62,7 +62,7 @@ function Login() {
       const { credential } = credentialResponse;
       dispatch(signInStart());
       const response = await axios.post(
-        'https://keep-t7qy.onrender.com/api/auth/google',
+        'http://localhost:3000/api/auth/google',
         { token: credential },
         { withCredentials: true }
       );
