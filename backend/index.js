@@ -11,7 +11,14 @@ const app = express();
 // //to make input as json              
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin:["https://fullstack-app-1-swss.onrender.com"], credentials:true}))
+app.use(
+    cors({
+      origin: 'https://fullstack-app-2.onrender.com', // Replace with your frontend's URL
+      methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+      allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+      credentials: true, // Allow cookies if needed
+    })
+  );
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to MongoDB');
 }).catch((error) => {
